@@ -1,0 +1,23 @@
+{
+    "name": "cheftonic92/to-do-list",
+    "description": "Task list project",
+    "type": "project",
+    "require": {
+        "slim/slim": "^4.0",
+        "slim/psr7": "^1.3",
+        "illuminate/database": "^8.0",
+        "vlucas/phpdotenv": "^5.3"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Cheftonic92\\ToDoList\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "cheftonic92",
+            "email": "ab.saez.1992@gmail.com"
+        }
+    ]
+}

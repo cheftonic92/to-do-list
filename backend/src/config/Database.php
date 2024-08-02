@@ -2,11 +2,19 @@
 
 class Database
 {
-    private $host = 'localhost';
-    private $dbname = 'to-do-list-db';
-    private $username = 'root';
-    private $password = '';
+    private $host;
+    private $dbname;
+    private $username;
+    private $password;
     public $conn;
+
+    public function __construct()
+    {
+        $this->host = getenv('DB_HOST');
+        $this->dbname = getenv('DB_DATABASE');
+        $this->username = getenv('DB_USERNAME');
+        $this->password = getenv('DB_PASSWORD');
+    }
 
     public function getConnection()
     {
