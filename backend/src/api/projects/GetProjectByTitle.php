@@ -1,8 +1,8 @@
 <?php
 
 
-include("../../config/Database.php");
 include("../../config/Headers.php");
+include("../../config/Database.php");
 include_once("../../models/Projects.php");
 
 // Instanciar la base de datos y el objeto de usuario
@@ -35,7 +35,7 @@ if ($num > 0) {
             'status' => $status,
             'start_date' => $start_date,
             'deadline' => $deadline,
-            'created' => $created
+            'client' => $client
         );
         array_push($projects_arr, $project_item);
     }

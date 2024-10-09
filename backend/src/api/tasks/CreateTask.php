@@ -1,7 +1,7 @@
 <?php
 
-include_once '../../config/Database.php';
 include_once '../../config/Headers.php';
+include_once '../../config/Database.php';
 include_once '../../models/Tasks.php';
 
 $conn = new Database();

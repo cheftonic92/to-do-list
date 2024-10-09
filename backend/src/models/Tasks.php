@@ -37,6 +37,15 @@ class Tasks
         return $stmt;
     }
 
+    public function getTasksByProject()
+    {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE project_id = :project_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':project_id', $this->project_id);
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function createTask()
     {
         $query = "INSERT INTO " . $this->table_name . " SET title=:title, description=:description, 
@@ -64,45 +73,61 @@ class Tasks
         return false;
     }
 
-    public function updateTask($id)
+    public function updateTask()
     {
-        $query = "INSERT INTO " . $this->table_name . " SET title=:title, description=:description, 
-        status=:status, deadline=:deadline, created=:created, project_id=:project_id WHERE id=:id";
+        // Consulta SQL para actualizar un proyecto
+        $query = "UPDATE " . $this->table_name . "
+                  SET title = :title,
+                      description = :description,
+                      status = :status,
+                      created = :created,
+                      project_id = :project_id
+                      deadline = :deadline,
+                  WHERE id = :id";
+
+        // Preparar la consulta
         $stmt = $this->conn->prepare($query);
 
-        $this->id = htmlspecialchars(strip_tags($id));
+        // Limpiar los datos para evitar inyecciones SQL
+        $this->id = htmlspecialchars(strip_tags($this->id));
         $this->title = htmlspecialchars(strip_tags($this->title));
         $this->description = htmlspecialchars(strip_tags($this->description));
         $this->status = htmlspecialchars(strip_tags($this->status));
-        $this->deadline = htmlspecialchars(strip_tags($this->deadline));
         $this->created = htmlspecialchars(strip_tags($this->created));
         $this->project_id = htmlspecialchars(strip_tags($this->project_id));
+        $this->deadline = htmlspecialchars(strip_tags($this->deadline));
 
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(":title", $this->title);
-        $stmt->bindParam(":description", $this->description);
-        $stmt->bindParam(":status", $this->status);
-        $stmt->bindParam(":deadline", $this->deadline);
-        $stmt->bindParam(":created", $this->created);
-        $stmt->bindParam(":project_id", $this->project_id);
+        // Vincular los parámetros
+        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(':title', $this->title);
+        $stmt->bindParam(':description', $this->description);
+        $stmt->bindParam(':status', $this->status);
+        $stmt->bindParam(':created', $this->created);
+        $stmt->bindParam(':project_id', $this->project_id);
+        $stmt->bindParam(':deadline', $this->deadline);
 
+        // Ejecutar la consulta
         if ($stmt->execute()) {
             return true;
         }
+
+        // Imprimir error si algo sale mal (para depuración)
+        printf("Error: %s.\n", $stmt->error);
+
         return false;
     }
 
-    public function deleteTask($id)
+    public function deleteTask()
     {
         $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
 
-        $this->id = htmlspecialchars(strip_tags($this->id));
-        $stmt->bindParam(':id', $id);
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
 
         if ($stmt->execute()) {
             return true;
         }
+
         return false;
     }
 

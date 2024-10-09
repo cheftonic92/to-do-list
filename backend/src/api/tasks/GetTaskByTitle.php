@@ -1,8 +1,8 @@
 <?php
 
 
-include("../../config/Database.php");
 include("../../config/Headers.php");
+include("../../config/Database.php");
 include_once("../../models/Tasks.php");
 
 // Instanciar la base de datos y el objeto de usuario

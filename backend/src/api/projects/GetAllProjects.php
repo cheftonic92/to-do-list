@@ -1,8 +1,8 @@
 <?php
 
+include("../../config/Headers.php");
 include("../../config/Database.php");
 include_once("../../models/Projects.php");
-include("../../config/Headers.php");
 
 $conn = new Database();
 $db = $conn->getConnection();
@@ -23,7 +23,7 @@ if ($num > 0) {
             'status' => $status,
             'start_date' => $start_date,
             'deadline' => $deadline,
-            'created' => $created,
+            'client' => $client,
         );
 
         array_push($projects, $project_item);

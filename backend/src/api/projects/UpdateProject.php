@@ -1,56 +1,30 @@
 <?php
-
+include("../../config/Headers.php");
 include("../../config/Database.php");
 include_once("../../models/Projects.php");
-include("../../config/Headers.php");
 
 $conn = new Database();
 $db = $conn->getConnection();
 
-// Verifica si se proporcionó un ID válido
-if (!isset($_GET['id'])) {
-    http_response_code(400);
-    echo json_encode(array('message' => 'ID not provided.'));
-    exit();
-}
+$data = json_decode(file_get_contents('php://input'));  // Obtener datos JSON de la solicitud
 
-$project = new Projects($db);
-
-$id = $_GET['id'];
-
-$data = json_decode(file_get_contents('php://input'));
-
-if ($data) {
+if ($data && isset($data->id)) {  // Verifica que se reciban los datos y el ID del proyecto
+    $project = new Projects($db);
+    $project->id = $data->id;
     $project->title = $data->title;
     $project->description = $data->description;
-    $project->status = $data->status;
+    $project->client = $data->client;
     $project->start_date = $data->start_date;
     $project->deadline = $data->deadline;
-    $project->created = $data->created;
+    $project->status = $data->status;  // Aquí se maneja el status
 
-    if (!$project->updateProject($id)) {
-        http_response_code(500);
-        echo json_encode(
-            array(
-                'message' => 'Error al añadir usuario.'
-            )
-        );
-        return;
+    if ($project->updateProject()) {
+        echo json_encode(["message" => "Project was updated."]);
+    } else {
+        echo json_encode(["message" => "Unable to update project."]);
     }
-
-    echo json_encode(
-        array(
-            'project' => array(
-                'id' => $id,
-                'title' => $title,
-                'description' => $description,
-                'status' => $status,
-                'start_date' => $start_date,
-                'deadline' => $deadline,
-                'created' => $created
-            )
-        )
-    );
 } else {
-    echo json_encode(array('message' => 'No data provided.'));
+    // Error si el parámetro 'id' o los datos están incompletos
+    http_response_code(400);  // Código de error 400 Bad Request
+    echo json_encode(["message" => "Incomplete or invalid data."]);
 }

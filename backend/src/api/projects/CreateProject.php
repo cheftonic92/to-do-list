@@ -1,7 +1,7 @@
 <?php
 
-include("../../config/Database.php");
 include("../../config/Headers.php");
+include("../../config/Database.php");
 include_once("../../models/Projects.php");
 
 $conn = new Database();
@@ -16,13 +16,13 @@ if ($data) {
     $project->status = $data->status;
     $project->start_date = $data->start_date;
     $project->deadline = $data->deadline;
-    $project->created = $data->created;
+    $project->client = $data->client;
 
     if (!$project->createProject()) {
         http_response_code(500);
         echo json_encode(
             array(
-                'message' => 'Error al añadir usuario.'
+                'message' => 'Error al añadir proyecto.'
             )
         );
         return;
@@ -37,7 +37,7 @@ if ($data) {
                 'status' => $project->status,
                 'start_date' => $project->start_date,
                 'deadline' => $project->deadline,
-                'created' => $project->created,
+                'client' => $project->client,
             )
         )
     );

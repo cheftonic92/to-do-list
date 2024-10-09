@@ -10,10 +10,10 @@ class Database
 
     public function __construct()
     {
-        $this->host = getenv('DB_HOST');
-        $this->dbname = getenv('DB_DATABASE');
-        $this->username = getenv('DB_USERNAME');
-        $this->password = getenv('DB_PASSWORD');
+        $this->host = 'localhost';
+        $this->dbname = 'to-do-list';
+        $this->username = 'root';
+        $this->password = '';
     }
 
     public function getConnection()

@@ -3,7 +3,7 @@
         'name' => 'cheftonic92/to-do-list',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '6ca76a8cc50390b526411ad0a6a95bb780347aef',
+        'reference' => 'ce9a0eabd82df0adfcb4e18587a930acceb6755f',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'cheftonic92/to-do-list' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '6ca76a8cc50390b526411ad0a6a95bb780347aef',
+            'reference' => 'ce9a0eabd82df0adfcb4e18587a930acceb6755f',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

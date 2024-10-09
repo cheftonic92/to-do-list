@@ -1,8 +1,8 @@
 <?php
 
+include("../../config/Headers.php");
 include("../../config/Database.php");
 include_once("../../models/Projects.php");
-include("../../config/Headers.php");
 
 $conn = new Database();
 $db = $conn->getConnection();

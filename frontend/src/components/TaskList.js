@@ -1,30 +1,43 @@
-import React from 'react';
+// src/components/TaskList.js
 
-const TaskList = ({ tasks, updateTask, deleteTask, setTask }) => {
+import React, { useEffect, useState } from 'react';
+import { getTasksByProject } from '../services/ApiService';
+import TaskCard from './TaskCard';
+
+const TaskList = ({ show, onClose, projectId, onEditTask, onDeleteTask, projectName }) => {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const data = await getTasksByProject(projectId);
+        setTasks(data);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
+    fetchTasks();
+  }, [projectId]);
+  
+
   return (
-    <div>
-      {tasks.map((task) => (
-        <div key={task.id} className="card mb-2">
-          <div className="card-body">
-            <h5 className="card-title">{task.title}</h5>
-            <p className="card-text">{task.description}</p>
-            <button
-              className="btn btn-warning mr-2"
-              onClick={() => setTask(task)}
-            >
-              Edit
-            </button>
-            <button
-              className="btn btn-danger"
-              onClick={() => deleteTask(task.id)}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      ))}
+    <div className="card mb-0" style={{ backgroundColor: '#e0eafc', padding: '20px', paddingBottom: '2px', display: show ? 'block' : 'none' }}>
+      <h5>Tareas del Proyecto</h5>
+      <div className="mt-3">
+        {tasks.map((task) => (
+          <TaskCard
+            key={task.id}
+            task={task}
+            onEditTask={(projectId, projectName, task) => onEditTask(projectId, projectName, task)} // Llama a la función correcta para editar
+            onDeleteTask={() => onDeleteTask(task.id)}
+          />
+        ))}
+      </div>
     </div>
   );
 };
 
 export default TaskList;
+
+
