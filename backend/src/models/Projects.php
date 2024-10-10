@@ -46,7 +46,7 @@ class Projects
         $this->title = htmlspecialchars(strip_tags($this->title));
         $this->description = htmlspecialchars(strip_tags($this->description));
         $this->status = htmlspecialchars(strip_tags($this->status));
-        $this->start_date = htmlspecialchars(strip_tags($this->start_date));
+        $this->start_date = date('Y-m-d H:i:s');  // Genera la fecha y hora actuales
         $this->deadline = htmlspecialchars(strip_tags($this->deadline));
         $this->client = htmlspecialchars(strip_tags($this->client));
 

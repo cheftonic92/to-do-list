@@ -1,65 +1,90 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Offcanvas, Form, FloatingLabel } from 'react-bootstrap';
-import { createProject, updateProject } from '../services/ApiService';
+import { createProject, updateProject, createTask, updateTask } from '../services/ApiService';
 import { toast } from 'react-toastify';
 
-const Sidebar = ({ show, handleClose, action, data, handleSave }) => {
+const Sidebar = ({ show, handleClose, action, type, data, handleSave, selectedProject }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [client, setClient] = useState('');
-  const [startDate, setStartDate] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [status, setStatus] = useState('');
+  const [projectId, setProjectId] = useState(null); // Solo para tareas
 
-  // Función para formatear la fecha a 'yyyy-MM-dd'
-  const formatDateToYMD = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses en JS son 0-indexed
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  // Efecto para inicializar los campos si se va a editar o crear un proyecto
   useEffect(() => {
     if (action === 'update' && data) {
-      setTitle(data.title);
-      setDescription(data.description);
-      setClient(data.client);
-      setStartDate(data.startDate); // Asumimos que `project.startDate` ya está en formato correcto
-      setDeadline(data.deadline);
-    } else {
-      // Inicializamos los campos para la creación de un nuevo proyecto
+      setTitle(data.title || '');
+      setDescription(data.description || '');
+      setDeadline(data.deadline || '');
+      setStatus(data.status || '');
+
+      if (type === 'task') {
+        // Asegúrate de que el project_id esté presente al actualizar una tarea
+        setProjectId(data.project_id || selectedProject?.id || null); 
+      } else if (type === 'project') {
+        setClient(data.client || '');
+      }
+    } else if (action === 'create') {
+      // Resetear los campos cuando se crea un nuevo proyecto o tarea
       setTitle('');
       setDescription('');
       setClient('');
-      setStartDate(formatDateToYMD(new Date())); // Establecemos la fecha de inicio en formato 'yyyy-MM-dd'
       setDeadline('');
+      setStatus('');
+
+      if (type === 'task') {
+        // Si se está creando una nueva tarea, usar el selectedProject para obtener el project_id
+        setProjectId(selectedProject?.id || null);
+      }
     }
-  }, [action, data]);
+  }, [action, data, type, selectedProject]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevenir la recarga de la página
+    e.preventDefault();
 
     const projectData = {
       title,
       description,
       client,
-      startDate,
       deadline,
+      status
+    };
+
+    const taskData = {
+      title,
+      description,
+      deadline,
+      status,
+      project_id: projectId // Asegúrate de que el ID del proyecto esté presente en las tareas
     };
 
     try {
       if (action === 'create') {
-        await createProject(projectData); // Crear nuevo proyecto
-        toast.success('Proyecto creado con éxito');
+        if (type === 'project') {
+          await createProject(projectData);
+          toast.success('Proyecto creado con éxito');
+        } else if (type === 'task') {
+          if (!taskData.project_id) {
+            toast.error('El ID del proyecto es obligatorio para crear una tarea.');
+            return;
+          }
+          await createTask(taskData);
+          toast.success('Tarea creada con éxito');
+        }
       } else if (action === 'update') {
-        await updateProject(data.id, projectData); // Actualizar proyecto existente
-        toast.success('Proyecto actualizado con éxito');
+        if (type === 'project') {
+          await updateProject(data.id, projectData);
+          toast.success('Proyecto actualizado con éxito');
+        } else if (type === 'task') {
+          await updateTask(data.id, taskData);
+          toast.success('Tarea actualizada con éxito');
+        }
       }
-      handleClose(); // Cerrar la sidebar al finalizar
-      handleSave(); // Refrescar la lista de proyectos
+      handleClose();
+      handleSave();
     } catch (error) {
-      console.error('Error al guardar el proyecto:', error);
-      toast.error('Error al guardar el proyecto'); // Muestra un solo error en caso de fallo
+      console.error('Error al guardar:', error);
+      toast.error('Error al guardar');
     }
   };
 
@@ -67,8 +92,10 @@ const Sidebar = ({ show, handleClose, action, data, handleSave }) => {
     <Offcanvas show={show} onHide={handleClose} placement="end">
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>
-          {action === 'create' && 'Crear nuevo proyecto'}
-          {action === 'update' && 'Actualizar proyecto'}
+          {type === 'project' && (action === 'create' ? 'Crear nuevo proyecto' : `Actualizar ${data?.title || ''}`)}
+          {type === 'task' && (action === 'create' 
+            ? `Crear nueva tarea para ${selectedProject?.title || 'el proyecto'}`
+            : `Actualizar tarea en ${selectedProject?.title || ''}`)}
         </Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body>
@@ -89,22 +116,19 @@ const Sidebar = ({ show, handleClose, action, data, handleSave }) => {
               required
             />
           </FloatingLabel>
-          <FloatingLabel controlId="floatingInput" label="Cliente" className="mb-3">
-            <Form.Control
-              type="text"
-              value={client}
-              onChange={(e) => setClient(e.target.value)}
-              required
-            />
-          </FloatingLabel>
-          <FloatingLabel controlId="floatingInput" label="Fecha de inicio" className="mb-3">
-            <Form.Control
-              type="date"
-              value={startDate} // Valor en formato correcto 'yyyy-MM-dd'
-              onChange={(e) => setStartDate(e.target.value)}
-              required
-            />
-          </FloatingLabel>
+
+          {/* Solo mostrar el campo "Cliente" si es un proyecto */}
+          {type === 'project' && (
+            <FloatingLabel controlId="floatingInput" label="Cliente" className="mb-3">
+              <Form.Control
+                type="text"
+                value={client}
+                onChange={(e) => setClient(e.target.value)}
+                required
+              />
+            </FloatingLabel>
+          )}
+
           <FloatingLabel controlId="floatingInput" label="Fecha límite" className="mb-3">
             <Form.Control
               type="date"
@@ -113,8 +137,25 @@ const Sidebar = ({ show, handleClose, action, data, handleSave }) => {
               required
             />
           </FloatingLabel>
+
+          <FloatingLabel controlId="floatingInput" label="Estado" className="mb-3">
+            <Form.Control
+              as="select"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              required
+            >
+              <option value="">Selecciona el estado</option>
+              <option value="0">Sin iniciar</option>
+              <option value="1">En proceso</option>
+              <option value="2">Finalizado</option>
+            </Form.Control>
+          </FloatingLabel>
+
           <Button variant="outline-primary" type="submit" id="button-addon2">
-            {action === 'create' ? 'Crear Proyecto' : 'Actualizar Proyecto'}
+            {action === 'create' && type === 'project' && 'Crear Proyecto'}
+            {action === 'create' && type === 'task' && 'Crear Tarea'}
+            {action === 'update' && `Actualizar ${title}`}
           </Button>
         </Form>
       </Offcanvas.Body>

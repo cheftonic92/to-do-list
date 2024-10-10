@@ -56,7 +56,7 @@ class Tasks
         $this->description = htmlspecialchars(strip_tags($this->description));
         $this->status = htmlspecialchars(strip_tags($this->status));
         $this->deadline = htmlspecialchars(strip_tags($this->deadline));
-        $this->created = htmlspecialchars(strip_tags($this->created));
+        $this->created = date('Y-m-d H:i:s');  // Genera la fecha y hora actuales
         $this->project_id = htmlspecialchars(strip_tags($this->project_id));
 
         $stmt->bindParam(":title", $this->title);
@@ -81,8 +81,8 @@ class Tasks
                       description = :description,
                       status = :status,
                       created = :created,
-                      project_id = :project_id
                       deadline = :deadline,
+                      project_id = :project_id
                   WHERE id = :id";
 
         // Preparar la consulta

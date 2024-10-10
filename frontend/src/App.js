@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SearchBar from './components/SearchBar';
-import { RiUserAddFill } from "react-icons/ri"
+import { RiUserAddFill } from "react-icons/ri";
 import { Button } from 'react-bootstrap';
 import ProjectCard from './components/ProjectCard';
 import Sidebar from './components/Sidebar';
-import { getAllProjects, createProject, getProjectByClient, deleteProject } from './services/ApiService';
+import { getAllProjects, getProjectByClient } from './services/ApiService';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -16,12 +16,16 @@ const App = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   const [sidebarAction, setSidebarAction] = useState('');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedTask, setSelectedTask] =useState(null)
+  const [sidebarType, setSidebarType] = useState(''); // Para diferenciar entre proyectos y tareas
 
-  const handleCloseSidebar = () => {setShowSidebar(false)};
+  const handleCloseSidebar = () => { setShowSidebar(false); };
 
-  const handleShowSidebar = ( action, project = null, task=null) => {
+  const handleShowSidebar = (action, type, project = null, task = null) => {
     setSidebarAction(action);
-    setSelectedProject(project);
+    setSidebarType(type); // Define si es proyecto o tarea
+    setSelectedProject(project); // Asegúrate de pasar correctamente el proyecto aquí
+    setSelectedTask(task);
     setShowSidebar(true);
   };
 
@@ -29,7 +33,6 @@ const App = () => {
   useEffect(() => {
     fetchProjects();
   }, []);
-
 
   // Fetch all projects from the API
   const fetchProjects = async () => {
@@ -51,7 +54,7 @@ const App = () => {
     }
   };
 
-  // Handle adding a new project
+  // Handle saving a project or task
   const handleSave = () => {
     fetchProjects(); // Recarga la lista de proyectos
   };
@@ -67,11 +70,20 @@ const App = () => {
             <SearchBar onSearch={handleSearch} />
           </div>
           {/* Toggle sidebar on button click */}
-        <Button className="btn btn-block d-block d-md-none btn-primary"  id="button-addon2" onClick={() => handleShowSidebar('create')}>
-        <RiUserAddFill /> 
+          <Button
+            className="btn btn-block d-block d-md-none btn-primary"
+            id="button-addon2"
+            onClick={() => handleShowSidebar('create', 'project')}
+          >
+            <RiUserAddFill />
           </Button>
           {/* El botón se muestra como texto en dispositivos no móviles */}
-          <Button className="btn btn-block d-none d-md-block" variant="outline-primary" id="button-addon2" onClick={() => handleShowSidebar('create')}>
+          <Button
+            className="btn btn-block d-none d-md-block"
+            variant="outline-primary"
+            id="button-addon2"
+            onClick={() => handleShowSidebar('create', 'project')}
+          >
             Añadir Proyecto
           </Button>
         </div>
@@ -80,12 +92,13 @@ const App = () => {
         <div className="project-list mt-4">
           {projects.length > 0 ? (
             projects.map((project) => (
-              <ProjectCard 
-              key={project.id} 
-              data={project}
-              onAddTask={() => handleShowSidebar('create')}
-              onEditProject={() => handleShowSidebar('update', project)}
-              handleSave={handleSave} 
+              <ProjectCard
+                key={project.id}
+                data={project}
+                onAddTask={() => handleShowSidebar('create', 'task', project)} // Asegúrate de que project se pasa aquí
+                onEditProject={() => handleShowSidebar('update', 'project', project)}
+                handleSave={handleSave}
+                onEditTask={(task) => handleShowSidebar('update', 'task', project, task)}
               />
             ))
           ) : (
@@ -98,7 +111,9 @@ const App = () => {
         show={showSidebar}
         handleClose={handleCloseSidebar}
         action={sidebarAction}
-        data={selectedProject}
+        type={sidebarType}
+        data={sidebarType === 'task' ? selectedTask : selectedProject} // Pasas el proyecto o la tarea
+        selectedProject={selectedProject} // Asegúrate de pasar selectedProject
         handleSave={handleSave} // Refresca la lista al guardar
       />
 
