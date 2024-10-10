@@ -13,7 +13,7 @@ const TaskCard = ({ data, onEditTask, onDeleteTask }) => {
               {data.description}
             </p>
             <p className="mb-0">
-              <strong>Cliente:</strong> {data.client}
+              <strong>Creada:</strong> {new Date(data.created).toLocaleDateString()}
             </p>
           </div>
           <div className="text-end mb-0" style={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
@@ -25,6 +25,12 @@ const TaskCard = ({ data, onEditTask, onDeleteTask }) => {
                 <FaTrash size={15} />
               </button>
             </div>
+            <p className="text-end" style={{ padding: '15px', paddingRight: '0' }}>
+                <strong>Deadline:</strong> {new Date(data.deadline).toLocaleDateString()}
+              </p>
+              <p className="text-end mb-0">
+                <strong>Status:</strong> {data.status === 0 ? 'Sin iniciar' : data.status === 1 ? 'En proceso' : 'Finalizado'}
+              </p>
           </div>
         </div>
       </div>

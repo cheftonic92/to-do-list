@@ -129,6 +129,18 @@ const Sidebar = ({ show, handleClose, action, type, data, handleSave, selectedPr
             </FloatingLabel>
           )}
 
+          {action === 'create' && (
+            <FloatingLabel controlId="floatingInput" label="Fecha de creación" className="mb-3">
+              <Form.Control
+                type="date"
+                value={new Date().toISOString().split('T')[0]} // Formato correcto 'YYYY-MM-DD'
+                placeholder={new Date().toISOString().split('T')[0]} // Formato correcto 'YYYY-MM-DD'
+                required
+                disabled
+             />
+            </FloatingLabel>
+          )}
+
           <FloatingLabel controlId="floatingInput" label="Fecha límite" className="mb-3">
             <Form.Control
               type="date"
@@ -145,7 +157,7 @@ const Sidebar = ({ show, handleClose, action, type, data, handleSave, selectedPr
               onChange={(e) => setStatus(e.target.value)}
               required
             >
-              <option value="">Selecciona el estado</option>
+              <option value="" disabled>Selecciona el estado</option>
               <option value="0">Sin iniciar</option>
               <option value="1">En proceso</option>
               <option value="2">Finalizado</option>

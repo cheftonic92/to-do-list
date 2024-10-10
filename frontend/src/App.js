@@ -59,6 +59,11 @@ const App = () => {
     fetchProjects(); // Recarga la lista de proyectos
   };
 
+  // Función para ordenar los proyectos por fecha de deadline
+const sortProjectsByDeadline = (projects) => {
+  return projects.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+};
+
   return (
     <div className="App">
       <Navbar />
@@ -91,7 +96,8 @@ const App = () => {
         {/* Project list */}
         <div className="project-list mt-4">
           {projects.length > 0 ? (
-            projects.map((project) => (
+            // Aplicamos la función de ordenación antes de mapear los proyectos
+          sortProjectsByDeadline(projects).map((project) => (
               <ProjectCard
                 key={project.id}
                 data={project}
