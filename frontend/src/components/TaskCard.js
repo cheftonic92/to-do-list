@@ -1,7 +1,23 @@
 import React from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { deleteTask } from '../services/ApiService';
+import { toast } from 'react-toastify';
 
-const TaskCard = ({ data, onEditTask, onDeleteTask }) => {
+const TaskCard = ({ data, onEditTask }) => {
+
+  const handleDeleteClick = async (e) => {
+    e.stopPropagation();
+    try {
+      if (window.confirm('¿Estás seguro de que deseas eliminar este proyecto?')) {
+        await deleteTask(data.id);
+        toast.success('Proyecto eliminado con éxito');
+      }
+    } catch (error) {
+      console.error('Error al eliminar proyecto:', error);
+      toast.error('Error eliminando proyecto');
+    }
+  };
+
   return (
     <div className="card mb-3" style={{ backgroundColor: '#f0f6ff', padding: '20px', paddingBottom: '7px' }}>
       <div className="card-body" style={{ padding: '0', paddingBottom: '10px' }}>
@@ -21,7 +37,7 @@ const TaskCard = ({ data, onEditTask, onDeleteTask }) => {
               <button className="btn btn-outline-primary me-2" onClick={onEditTask}> {/* Usa onEditTask correctamente */}
                 <FaEdit size={15} />
               </button>
-              <button className="btn btn-outline-danger" onClick={onDeleteTask}>
+              <button className="btn btn-outline-danger" onClick={handleDeleteClick}>
                 <FaTrash size={15} />
               </button>
             </div>
